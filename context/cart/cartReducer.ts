@@ -1,11 +1,14 @@
 import { CartState } from './';
 import { ICartProduct } from '../../interfaces';
+import { ShippingAddress } from './CartProvider';
 
 type CartActionType =
-    | { type: 'Cart_Load_Products_Cookie', payload: ICartProduct[] }
+    | { type: 'Cart_LoadProducts_Cookies', payload: ICartProduct[] }
     | { type: 'Cart_Update_Products', payload: ICartProduct[] }
     | { type: 'Cart_Change_Quantity', payload: ICartProduct }
     | { type: 'Cart_Remove_Product', payload: ICartProduct }
+    | { type: 'Cart_LoadAddress_Cookies', payload: ShippingAddress }
+    | { type: 'Cart_Update_Address', payload: ShippingAddress }
     | {
         type: 'Cart_Update_Order',
         payload: {
@@ -19,9 +22,10 @@ type CartActionType =
 export const cartReducer = (state: CartState, action: CartActionType): CartState => {
 
     switch (action.type) {
-        case 'Cart_Load_Products_Cookie':
+        case 'Cart_LoadProducts_Cookies':
             return {
                 ...state,
+                isLoaded: true,
                 cart: [...action.payload]
             }
 
@@ -45,6 +49,13 @@ export const cartReducer = (state: CartState, action: CartActionType): CartState
             return {
                 ...state,
                 cart: state.cart.filter(product => !(product._id === action.payload._id && product.size === action.payload.size))
+            }
+
+        case 'Cart_Update_Address':
+        case 'Cart_LoadAddress_Cookies':
+            return {
+                ...state,
+                shippingAddress: action.payload
             }
 
         case 'Cart_Update_Order':
