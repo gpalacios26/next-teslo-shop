@@ -1,4 +1,4 @@
-import { useContext } from 'react';
+import { useContext, useEffect } from 'react';
 import { NextPage } from 'next';
 import { useRouter } from 'next/router';
 import { Box, Button, FormControl, Grid, MenuItem, TextField, Typography } from '@mui/material';
@@ -37,9 +37,22 @@ const AddressPage: NextPage = () => {
     const router = useRouter();
     const { updateAddress } = useContext(CartContext);
 
-    const { register, handleSubmit, formState: { errors } } = useForm<FormData>({
-        defaultValues: getAddressFromCookies()
+    const { register, handleSubmit, formState: { errors }, reset } = useForm<FormData>({
+        defaultValues: {
+            firstName: '',
+            lastName: '',
+            address: '',
+            address2: '',
+            zip: '',
+            city: '',
+            country: 'PER',
+            phone: '',
+        }
     });
+
+    useEffect(() => {
+        reset(getAddressFromCookies());
+    }, [reset]);
 
     const onSubmitAddress = (data: FormData) => {
         updateAddress(data);

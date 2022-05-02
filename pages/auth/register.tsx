@@ -1,7 +1,8 @@
 import { useContext, useState } from 'react';
-import { NextPage } from 'next';
+import { GetServerSideProps, NextPage } from 'next';
 import NextLink from 'next/link';
 import { useRouter } from 'next/router';
+import { signIn, getSession } from 'next-auth/react';
 import { Box, Button, Chip, Grid, Link, TextField, Typography } from '@mui/material';
 import { ErrorOutline } from '@mui/icons-material';
 import { useForm } from 'react-hook-form';
@@ -35,8 +36,7 @@ const RegisterPage: NextPage = () => {
             return;
         }
 
-        const destination = router.query.p?.toString() || '/';
-        router.replace(destination);
+        await signIn('credentials', { email, password });
     }
 
     return (
@@ -47,7 +47,7 @@ const RegisterPage: NextPage = () => {
                         <Grid item xs={12}>
                             <Typography variant='h1' component="h1">Crear Cuenta</Typography>
                             <Chip
-                                label="No se pudo crear al usuario"
+                                label={errorMessage ? errorMessage : 'No se pudo crear al usuario'}
                                 color="error"
                                 icon={<ErrorOutline />}
                                 className="fadeIn"
@@ -125,6 +125,26 @@ const RegisterPage: NextPage = () => {
             </form>
         </AuthLayout>
     )
+}
+
+export const getServerSideProps: GetServerSideProps = async ({ req, query }) => {
+
+    const session = await getSession({ req });
+
+    const { p = '/' } = query;
+
+    if (session) {
+        return {
+            redirect: {
+                destination: p.toString(),
+                permanent: false
+            }
+        }
+    }
+
+    return {
+        props: {}
+    }
 }
 
 export default RegisterPage;
