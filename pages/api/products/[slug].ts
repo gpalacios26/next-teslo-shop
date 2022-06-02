@@ -33,5 +33,10 @@ const getProductBySlug = async (req: NextApiRequest, res: NextApiResponse<Data>)
         });
     }
 
+    // Fotos en local y Cloudinary
+    product.images = product.images.map(image => {
+        return image.includes('http') ? image : `${process.env.HOST_NAME}products/${image}`
+    });
+
     return res.json(product);
 }

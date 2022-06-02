@@ -1,7 +1,7 @@
 import { isValidObjectId } from 'mongoose';
 import { db } from '.';
-import { IOrder } from '../interfaces';
 import { Order } from '../models';
+import { IOrder } from '../interfaces';
 
 export const getOrderById = async (id: string): Promise<IOrder | null> => {
 
@@ -16,6 +16,12 @@ export const getOrderById = async (id: string): Promise<IOrder | null> => {
     if (!order) {
         return null;
     }
+
+    // Fotos en local y Cloudinary
+    order.orderItems.map(item => {
+        item.image = item.image.includes('http') ? item.image : `${process.env.HOST_NAME}products/${item.image}`
+        return item;
+    });
 
     return JSON.parse(JSON.stringify(order));
 }
